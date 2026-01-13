@@ -1,4 +1,4 @@
-name: Deploy src/wasm/web to Pages
+name: Deploy wasm/web to Pages
 
 on:
   push:
