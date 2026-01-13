@@ -39,6 +39,41 @@ async function run() {
     }
     fr.readAsArrayBuffer(file)
   }, false)
+  const button = document.getElementById('loadGame');
+
+  button.addEventListener('click', async function (event) {
+    if (anim_frame != 0) {
+      window.cancelAnimationFrame(anim_frame)
+    }
+
+    const buffer = await getFile("animal_race.ch8");
+    if (buffer == null) {
+      return
+    }
+    const rom = new Uint8Array(buffer)
+    chip8.reset()
+    chip8.load_game(rom)
+    mainloop(chip8)
+
+
+
+  });
+
+}
+
+async function getFile(url) {
+  try {
+    const response = await fetch(url);
+
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+
+    const blob = await response.arrayBuffer();
+    return blob;
+  } catch (error) {
+    console.error('Fetch failed:', error);
+  }
 }
 function mainloop(chip8) {
   for (let i = 0; i < TICKS_PER_FRAME; i++) {
