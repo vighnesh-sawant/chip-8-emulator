@@ -4,7 +4,7 @@ const SCALE: u32 = 16;
 const WINDOW_WIDTH: u32 = (SCREEN_WIDTH as u32) * SCALE;
 const WINDOW_HEIGHT: u32 = (SCREEN_HEIGHT as u32) * SCALE;
 const TICKS_PER_FRAME: usize = 10;
-use chip8::{SCREEN_HEIGHT, SCREEN_WIDTH, cpu};
+use chip8::{Cpu, SCREEN_HEIGHT, SCREEN_WIDTH};
 use sdl2::{
     event::Event, keyboard::Keycode, pixels::Color, rect::Rect, render::Canvas, video::Window,
 };
@@ -28,7 +28,7 @@ fn main() {
     canvas.present();
     let mut event_pump = sdl_context.event_pump().unwrap();
 
-    let mut chip8 = cpu::new();
+    let mut chip8 = Cpu::new();
     let mut rom = File::open(&args[1]).expect("Unable to open file");
     let mut buffer = Vec::new();
     rom.read_to_end(&mut buffer).unwrap();
@@ -68,7 +68,7 @@ fn main() {
     }
 }
 
-fn draw_screen(cpu: &cpu, canvas: &mut Canvas<Window>) {
+fn draw_screen(cpu: &Cpu, canvas: &mut Canvas<Window>) {
     canvas.set_draw_color(Color::RGB(0, 0, 0));
     canvas.clear();
     let screen_buf = cpu.get_display();

@@ -29,7 +29,7 @@ const FONTSET: [u8; FONTSET_SIZE] = [
     0xF0, 0x80, 0xF0, 0x80, 0x80, // F
 ];
 
-pub struct cpu {
+pub struct Cpu {
     pc: u16,
     dt: u8,
     st: u8,
@@ -42,12 +42,12 @@ pub struct cpu {
     keys: [bool; NUM_KEYS],
 }
 
-impl Default for cpu {
+impl Default for Cpu {
     fn default() -> Self {
         Self::new()
     }
 }
-impl cpu {
+impl Cpu {
     pub fn new() -> Self {
         let mut new_cpu = Self {
             pc: START_ADDR,
@@ -163,16 +163,20 @@ impl cpu {
                 let x = digit2 as usize;
                 let y = digit3 as usize;
                 self.v_reg[x] |= self.v_reg[y];
+                self.v_reg[0xF] = 0;
             }
             (8, _, _, 2) => {
                 let x = digit2 as usize;
                 let y = digit3 as usize;
                 self.v_reg[x] &= self.v_reg[y];
+
+                self.v_reg[0xF] = 0;
             }
             (8, _, _, 3) => {
                 let x = digit2 as usize;
                 let y = digit3 as usize;
                 self.v_reg[x] ^= self.v_reg[y];
+                self.v_reg[0xF] = 0;
             }
             (8, _, _, 4) => {
                 let x = digit2 as usize;
@@ -192,6 +196,8 @@ impl cpu {
             }
             (8, _, _, 6) => {
                 let x = digit2 as usize;
+                let y = digit3 as usize;
+                self.v_reg[x] = self.v_reg[y];
                 let lsb = self.v_reg[x] & 1;
                 self.v_reg[x] >>= 1;
                 self.v_reg[0xF] = lsb;
@@ -206,6 +212,8 @@ impl cpu {
             }
             (8, _, _, 0xE) => {
                 let x = digit2 as usize;
+                let y = digit3 as usize;
+                self.v_reg[x] = self.v_reg[y];
                 let msb = (self.v_reg[x] >> 7) & 1;
                 self.v_reg[x] <<= 1;
                 self.v_reg[0xF] = msb;
@@ -334,16 +342,17 @@ impl cpu {
             (_, _, _, _) => unimplemented!("Unimplemented opcode: {}", op),
         }
     }
-    pub fn tick_timers(&mut self) {
+    pub fn tick_timers(&mut self) -> bool {
         if self.dt > 0 {
             self.dt -= 1;
         }
         if self.st > 0 {
             if self.st == 1 {
-                //eh i have to implement beeping here
+                return true;
             }
             self.st -= 1;
         }
+        false
     }
 
     pub fn reset(&mut self) {
