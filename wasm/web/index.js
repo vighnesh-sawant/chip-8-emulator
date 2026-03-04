@@ -39,8 +39,8 @@ async function run() {
     }
     fr.readAsArrayBuffer(file)
   }, false)
-  const button = document.getElementById('loadGame');
 
+  const button = document.getElementById('loadGame');
   button.addEventListener('click', async function (event) {
     if (anim_frame != 0) {
       window.cancelAnimationFrame(anim_frame)
